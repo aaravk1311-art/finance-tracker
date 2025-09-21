@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Finance Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Finance Tracker</h1>
+        <h2>Balance: ₹{{ balance }}</h2>
+
+        <!-- Form -->
+        <form method="POST">
+            <input type="text" name="description" placeholder="Description" required>
+            <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+            <select name="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button type="submit">Add</button>
+        </form>
+
+        <!-- Transaction list -->
+        <h3>Transactions</h3>
+        <ul>
+            {% for t in transactions %}
+                <li class="{{ t.type }}">
+                    {{ t.description }} - ₹{{ t.amount }} ({{ t.type }})
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Charts -->
+        <h3>Visualizations</h3>
+        <canvas id="pieChart"></canvas>
+        <canvas id="barChart"></canvas>
+    </div>
+
+    <!-- Chart.js Script -->
+    <script>
+        // Prepare data from Flask
+        const transactions = {{ transactions | tojson }};
+        
+        // Calculate totals for pie chart
+        let incomeTotal = 0, expenseTotal = 0;
+        transactions.forEach(t => {
+            if (t.type === "income") incomeTotal += t.amount;
+            else expenseTotal += t.amount;
+        });
+
+        // Pie Chart (Income vs Expense)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Income', 'Expense'],
+                datasets: [{
+                    data: [incomeTotal, expenseTotal],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        // Bar Chart (Transactions individually)
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: transactions.map(t => t.description),
+                datasets: [{
+                    label: 'Amount',
+                    data: transactions.map(t => t.type === "income" ? t.amount : -t.amount),
+                    backgroundColor: transactions.map(t => t.type === "income" ? '#28a745' : '#dc3545')
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
