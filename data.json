@@ -1,0 +1,23 @@
+[
+  {
+    "description": "Salary",
+    "amount": 50000,
+    "type": "income"
+  },
+  {
+    "description": "Groceries",
+    "amount": 3500,
+    "type": "expense"
+  },
+  {
+    "description": "Electricity Bill",
+    "amount": 1200,
+    "type": "expense"
+  },
+  
+  {
+    "description": "Dinner Out",
+    "amount": 900,
+    "type": "expense"
+  }
+]
